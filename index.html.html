@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApexNews Pro — Global Journal & Editorial CMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .ticker-wrap { overflow: hidden; white-space: nowrap; }
+        .ticker-move { display: inline-block; animation: ticker 35s linear infinite; }
+        .ticker-move:hover { animation-play-state: paused; }
+        @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col transition-colors duration-300">
+
+    <!-- Top Ad Monetization Slot -->
+    <div id="top-ad-banner" class="bg-slate-200 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-800 py-2 px-4 text-center text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2">
+        <span class="bg-amber-500/10 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded font-mono text-[10px] uppercase border border-amber-500/20">Sponsored Ad</span>
+        <span>Apex Global Partners: Accelerating Digital Transformation & Cloud Infrastructure. <a href="#" class="underline font-medium hover:text-brand-600">Learn More</a></span>
+    </div>
+
+    <!-- Main Navigation -->
+    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo & Brand -->
+            <div class="flex items-center gap-3">
+                <button onclick="switchView('portal')" class="flex items-center gap-2 group text-left">
+                    <div class="w-10 h-10 rounded-xl bg-slate-900 dark:bg-brand-500 flex items-center justify-center text-white font-serif font-bold text-xl shadow-lg shadow-slate-900/10 group-hover:scale-105 transition-transform">
+                        A
+                    </div>
+                    <div>
+                        <span class="text-2xl font-serif font-black tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-slate-600 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent">ApexNews</span>
+                        <span class="text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400 block -mt-1">Pro Edition</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Portal Navigation Categories -->
+            <nav id="nav-categories" class="hidden md:flex items-center gap-1 overflow-x-auto py-2">
+                <!-- Injected via JS -->
+            </nav>
+
+            <!-- Actions & Controls -->
+            <div class="flex items-center gap-3">
+                <!-- Search Trigger -->
+                <div class="relative hidden lg:block">
+                    <input type="text" id="global-search" placeholder="Search news & reports..." class="bg-slate-100 dark:bg-slate-800 text-sm rounded-full pl-9 pr-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-brand-500 border border-slate-200 dark:border-slate-700 transition-all">
+                    <i class="fas fa-search absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                </div>
+
+                <!-- Theme Toggle -->
+                <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" title="Toggle Theme">
+                    <i id="theme-icon" class="fas fa-moon text-sm"></i>
+                </button>
+
+                <!-- Admin Dashboard Switcher -->
+                <button onclick="toggleAdminView()" id="admin-toggle-btn" class="flex items-center gap-2 bg-slate-900 dark:bg-brand-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-slate-800 dark:hover:bg-brand-700 shadow-sm transition-all">
+                    <i class="fas fa-shield-halved text-xs"></i>
+                    <span id="admin-btn-text">CMS Admin</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container (Portal vs Admin) -->
+    <main class="flex-grow">
+        <!-- PORTAL VIEW -->
+        <div id="portal-view" class="space-y-8 pb-16">
+            <!-- Breaking News Ticker -->
+            <div class="bg-slate-900 text-white py-2.5 px-4 text-xs font-medium border-b border-slate-800">
+                <div class="max-w-7xl mx-auto flex items-center gap-4">
+                    <div class="flex items-center gap-2 text-rose-400 font-bold shrink-0 uppercase tracking-wider">
+                        <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+                        Breaking News
+                    </div>
+                    <div class="ticker-wrap overflow-hidden relative flex-grow">
+                        <div id="ticker-content" class="ticker-move flex gap-8">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                <!-- Magazine Hero Section -->
+                <section id="hero-section" class="pt-4">
+                    <!-- Injected by JS -->
+                </section>
+
+                <!-- Category Pills Bar (Mobile) -->
+                <div class="md:hidden flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="mobile-categories">
+                    <!-- Injected by JS -->
+                </div>
+
+                <!-- Main Content Grid with Sidebar -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <!-- News Feed (8 Cols) -->
+                    <div class="lg:col-span-8 space-y-6">
+                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+                            <h2 id="feed-heading" class="text-2xl font-serif font-bold text-slate-900 dark:text-white">Latest Dispatches</h2>
+                            <div class="flex items-center gap-2 text-sm text-slate-500">
+                                <span id="article-count-label">0 articles</span>
+                            </div>
+                        </div>
+
+                        <!-- Articles Feed List -->
+                        <div id="articles-feed" class="space-y-6">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Sidebar (4 Cols) -->
+                    <div class="lg:col-span-4 space-y-8">
+                        <!-- Skyscraper Ad Slot -->
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm text-center">
+                            <div class="text-[10px] uppercase font-mono tracking-widest text-slate-400 mb-2">Advertisement</div>
+                            <div class="bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 rounded-xl p-8 flex flex-col items-center justify-center min-h-[350px] border border-dashed border-slate-300 dark:border-slate-700">
+                                <i class="fas fa-rectangle-ad text-4xl text-slate-400 mb-3"></i>
+                                <span class="font-bold text-slate-700 dark:text-slate-300">Skyscraper Ad Slot</span>
+                                <span class="text-xs text-slate-500 mt-1">300 x 600 High Impact Display</span>
+                                <button onclick="simulateAdClick()" class="mt-4 bg-white dark:bg-slate-700 text-xs px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 hover:border-brand-500 transition-colors">Learn More</button>
+                            </div>
+                        </div>
+
+                        <!-- Trending Stories Sidebar -->
+                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <h3 class="font-serif font-bold text-lg mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+                                <i class="fas fa-fire text-amber-500"></i> Most Read Stories
+                            </h3>
+                            <div id="trending-sidebar-list" class="divide-y divide-slate-100 dark:divide-slate-800">
+                                <!-- Injected by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Newsletter Subscription Widget -->
+                        <div class="bg-gradient-to-br from-brand-600 to-brand-900 text-white rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                            <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+                            <h3 class="font-serif font-bold text-xl mb-2">The Apex Morning Brief</h3>
+                            <p class="text-xs text-brand-100 mb-4 leading-relaxed">Get handpicked geopolitical, tech, and economic journalism delivered to your inbox daily.</p>
+                            <form onsubmit="handleNewsletter(event)" class="space-y-3">
+                                <input type="email" placeholder="Enter your email address" required class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-sm placeholder-brand-200 text-white focus:outline-none focus:ring-2 focus:ring-white">
+                                <button type="submit" class="w-full bg-white text-brand-900 font-semibold py-2.5 rounded-xl text-sm hover:bg-brand-50 transition-colors shadow-md">Subscribe Free</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FULL ARTICLE READER VIEW MODAL / PAGE -->
+        <div id="article-reader-view" class="hidden max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+            <!-- Injected by JS -->
+        </div>
+
+        <!-- ADMIN CMS DASHBOARD VIEW -->
+        <div id="admin-view" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+            <!-- Admin Header -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div>
+                    <h1 class="text-2xl font-serif font-bold text-slate-900 dark:text-white">CMS Editorial & Analytics Control</h1>
+                    <p class="text-sm text-slate-500">Manage publications, monitor monetization metrics, and configure SEO metadata.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="openPostModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-lg shadow-brand-500/20 transition-all">
+                        <i class="fas fa-plus"></i> New Article
+                    </button>
+                    <button onclick="exportDataJSON()" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-200 transition-colors">
+                        <i class="fas fa-download mr-1"></i> Export Backup
+                    </button>
+                </div>
+            </div>
+
+            <!-- Metrics Overview Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Total Publications</span>
+                        <h3 id="stat-total-posts" class="text-3xl font-bold mt-1 text-slate-900 dark:text-white">0</h3>
+                        <span class="text-xs text-brand-600 dark:text-brand-400 font-medium mt-1 inline-block"><i class="fas fa-arrow-up mr-1"></i> +12% this month</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-brand-50 dark:bg-brand-900/30 text-brand-600 flex items-center justify-center text-xl">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Total Read Views</span>
+                        <h3 id="stat-total-views" class="text-3xl font-bold mt-1 text-slate-900 dark:text-white">0</h3>
+                        <span class="text-xs text-brand-600 dark:text-brand-400 font-medium mt-1 inline-block"><i class="fas fa-arrow-up mr-1"></i> +24.4% vs avg</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-xl">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Ad Impressions</span>
+                        <h3 id="stat-ad-impressions" class="text-3xl font-bold mt-1 text-slate-900 dark:text-white">0</h3>
+                        <span class="text-xs text-amber-600 font-medium mt-1 inline-block"><i class="fas fa-rectangle-ad mr-1"></i> Active slots</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center text-xl">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Est. Ad Revenue</span>
+                        <h3 id="stat-est-earnings" class="text-3xl font-bold mt-1 text-slate-900 dark:text-white">$0.00</h3>
+                        <span class="text-xs text-emerald-600 font-medium mt-1 inline-block"><i class="fas fa-dollar-sign mr-1"></i> Monetized</span>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center text-xl">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Tabs Navigation -->
+            <div class="border-b border-slate-200 dark:border-slate-800 flex gap-6">
+                <button onclick="switchAdminTab('posts')" id="admin-tab-posts-btn" class="pb-3 text-sm font-semibold border-b-2 border-brand-600 text-brand-600 transition-colors">Manage Articles</button>
+                <button onclick="switchAdminTab('ads')" id="admin-tab-ads-btn" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">Ad Monetization Control</button>
+                <button onclick="switchAdminTab('seo')" id="admin-tab-seo-btn" class="pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">SEO & Performance Inspector</button>
+            </div>
+
+            <!-- Tab 1: Articles Management Table -->
+            <div id="admin-tab-posts-content" class="space-y-4">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                        <input type="text" id="admin-search-posts" oninput="filterAdminPosts()" placeholder="Filter articles by title or author..." class="bg-slate-100 dark:bg-slate-800 text-sm rounded-xl px-4 py-2 w-72 focus:outline-none border border-slate-200 dark:border-slate-700">
+                        <span class="text-xs text-slate-500" id="admin-post-count-label">Showing all posts</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-800/50 text-[11px] uppercase tracking-wider text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800">
+                                    <th class="p-4">Article Title</th>
+                                    <th class="p-4">Category</th>
+                                    <th class="p-4">Author</th>
+                                    <th class="p-4">Date</th>
+                                    <th class="p-4 text-center">Views</th>
+                                    <th class="p-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-posts-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Ad Monetization Control -->
+            <div id="admin-tab-ads-content" class="hidden space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                        <h3 class="font-serif font-bold text-lg text-slate-900 dark:text-white">Active Ad Placement Units</h3>
+                        <p class="text-xs text-slate-500">Configure banner slots across the public reader portal.</p>
+                        
+                        <div class="space-y-3 pt-2">
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                                <div>
+                                    <h4 class="font-semibold text-sm">Top Leaderboard Banner (Header)</h4>
+                                    <span class="text-xs text-slate-400">728 x 90 • High Viewability</span>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked onchange="toggleAdSlot('header')" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                                <div>
+                                    <h4 class="font-semibold text-sm">Sidebar Skyscraper (Right Rail)</h4>
+                                    <span class="text-xs text-slate-400">300 x 600 • Sticky Desktop</span>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked onchange="toggleAdSlot('sidebar')" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                                <div>
+                                    <h4 class="font-semibold text-sm">In-Article Native Ad Card</h4>
+                                    <span class="text-xs text-slate-400">Dynamic Contextual • Feed Placement</span>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked onchange="toggleAdSlot('native')" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                        <h3 class="font-serif font-bold text-lg text-slate-900 dark:text-white">AdNetwork Integration & CPM</h3>
+                        <p class="text-xs text-slate-500">Connect Google AdSense publisher ID or custom programmatic script tags.</p>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">Publisher Ad Client ID</label>
+                                <input type="text" value="ca-pub-9928172938471029" class="w-full bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-2.5 text-sm border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold mb-1 uppercase tracking-wider text-slate-500">Average CPM Benchmark</label>
+                                <input type="text" value="$4.80 / 1,000 Impressions" class="w-full bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-2.5 text-sm border border-slate-200 dark:border-slate-700 focus:outline-none" readonly>
+                            </div>
+                            <button onclick="showToast('Ad network settings saved successfully!')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors shadow-md">Update Publisher Config</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: SEO Inspector -->
+            <div id="admin-tab-seo-content" class="hidden space-y-6">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+                    <div>
+                        <h3 class="font-serif font-bold text-lg text-slate-900 dark:text-white">Live Search Engine & Open Graph Inspector</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Preview how Google SERPs and social crawlers index ApexNews Pro publications.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4 border-t border-slate-200 dark:border-slate-800">
+                        <!-- Google SERP Card -->
+                        <div class="space-y-3">
+                            <h4 class="text-xs font-mono uppercase tracking-wider text-slate-400">Google SERP Preview Card</h4>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-1">
+                                <div class="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                                    <i class="fas fa-globe text-[10px]">></i> apexnewspro.com › article › global-tech-surge
+                                </div>
+                                <div class="text-blue-600 dark:text-blue-400 font-medium text-base hover:underline cursor-pointer">
+                                    Global Tech Surge: Semiconductor Manufacturing Hits Record High
+                                </div>
+                                <div class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    Discover how leading semiconductor fabrication plants are scaling production to meet unprecedented AI hardware demands across enterprise sectors.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Open Graph / Twitter Card -->
+                        <div class="space-y-3">
+                            <h4 class="text-xs font-mono uppercase tracking-wider text-slate-400">Social Open Graph Preview</h4>
+                            <div class="bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+                                <div class="h-32 bg-slate-200 dark:bg-slate-700 bg-cover bg-center flex items-center justify-center text-slate-400 text-xs" style="background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80')">
+                                    <span class="bg-black/50 px-2 py-1 rounded text-white text-[10px]">apexnewspro.com</span>
+                                </div>
+                                <div class="p-3 space-y-1">
+                                    <div class="text-[10px] uppercase font-mono text-slate-400">APEXNEWSPRO.COM</div>
+                                    <div class="font-bold text-sm text-slate-900 dark:text-white">Global Tech Surge: Semiconductor Manufacturing Hits Record High</div>
+                                    <div class="text-xs text-slate-500 line-clamp-1">Discover how leading semiconductor fabrication plants are scaling production...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Leaderboard Ad -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full my-8">
+        <div class="bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-2xl p-4 text-center text-xs text-slate-500 flex flex-col items-center justify-center gap-1">
+            <span class="bg-amber-500/10 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded font-mono text-[10px] uppercase border border-amber-500/20">Footer Leaderboard Ad (728x90)</span>
+            <span>Maximize publisher yields with Apex AdExchange programmatic header bidding.</span>
+        </div>
+    </div>
+
+    <!-- Main Footer -->
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div class="space-y-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-slate-900 dark:bg-brand-500 flex items-center justify-center text-white font-serif font-bold">A</div>
+                    <span class="font-serif font-bold text-xl tracking-tight">ApexNews Pro</span>
+                </div>
+                <p class="text-xs text-slate-500 leading-relaxed">Independent global journalism, financial market insights, and deep-dive technical dispatches for the modern professional.</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-3 uppercase tracking-wider text-slate-400">Editorial Categories</h4>
+                <ul class="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+                    <li><a href="#" onclick="filterCategory('Technology')" class="hover:text-brand-600">Technology & AI</a></li>
+                    <li><a href="#" onclick="filterCategory('Business')" class="hover:text-brand-600">Global Business</a></li>
+                    <li><a href="#" onclick="filterCategory('World')" class="hover:text-brand-600">World Affairs</a></li>
+                    <li><a href="#" onclick="filterCategory('Science')" class="hover:text-brand-600">Science & Space</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-3 uppercase tracking-wider text-slate-400">Publisher Network</h4>
+                <ul class="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+                    <li><a href="#" class="hover:text-brand-600">Ad Exchange & CPM</a></li>
+                    <li><a href="#" class="hover:text-brand-600">Syndication Rights</a></li>
+                    <li><a href="#" class="hover:text-brand-600">Editorial Guidelines</a></li>
+                    <li><a href="#" class="hover:text-brand-600">Security & Privacy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-3 uppercase tracking-wider text-slate-400">System Status</h4>
+                <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-xl space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-slate-500">Firebase Node</span>
+                        <span class="text-emerald-500 font-medium flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Connected</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-slate-500">LocalSync</span>
+                        <span class="text-emerald-500 font-medium">Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto border-t border-slate-100 dark:border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400">
+            <p>&copy; 2026 ApexNews Pro Media Group. All rights reserved.</p>
+            <div class="flex items-center gap-4 mt-2 sm:mt-0">
+                <a href="#" class="hover:underline">Privacy Policy</a>
+                <a href="#" class="hover:underline">Terms of Service</a>
+                <a href="#" class="hover:underline">Contact Editorial</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Post Creator & Editor Modal -->
+    <div id="post-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-3xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between sticky top-0 bg-white dark:bg-slate-900 z-10">
+                <h3 id="post-modal-title" class="font-serif font-bold text-xl text-slate-900 dark:text-white">Create New Article</h3>
+                <button onclick="closePostModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="post-form" onsubmit="handlePostSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="edit-post-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Article Title *</label>
+                        <input type="text" id="post-title" required placeholder="Enter catchy headline..." class="w-full bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-2.5 text-sm border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Category *</label>
+                        <select id="post-category" class="w-full bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-2.5 text-sm border border-slate-200 dark:border-slate-700 focus:outline-none">
+                            <option value="Technology">Technology</option>
+                            <option value="Business">Business</option>
+                            <option value="World">World</option>
+                            <option value="Science">Science</option>
+                            <option value="Culture">Culture</option>
+                            <option value="Lifestyle">Lifestyle</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Author Name *</label>
+                        <input type="text" id="post-author" required placeholder="e.g. Elena Rostova" class="w-full bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-2.5 text-sm border border-slate-200 dark:border-slate-700 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Featured Image URL *</label>
+                        <input type="url" id="post-image" required placeholder="https://images.unsplash.com/..." class="w-full bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-2.5 text-sm border border-slate-200 dark:border-slate-700 focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Short Excerpt *</label>
+                    <textarea id="post-excerpt" required rows="2" placeholder="Brief summary for card feeds..." class="w-full bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-2.5 text-sm border border-slate-200 dark:border-slate-700 focus:outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Full Article Body (Markdown / HTML supported) *</label>
+                    <textarea id="post-body" required rows="6" placeholder="Write full article content here..." class="w-full bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-2.5 text-sm border border-slate-200 dark:border-slate-700 focus:outline-none"></textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">SEO Meta Title</label>
+                        <input type="text" id="post-seo-title" placeholder="Optimized Google Title" class="w-full bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-2 text-xs border border-slate-200 dark:border-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">SEO Meta Description</label>
+                        <input type="text" id="post-seo-desc" placeholder="Search snippet description" class="w-full bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-2 text-xs border border-slate-200 dark:border-slate-700">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" onclick="closePostModal()" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl text-sm font-semibold bg-brand-600 hover:bg-brand-700 text-white shadow-lg shadow-brand-500/20">Publish Article</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Modal (No alert/confirm) -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-900/30 text-rose-600 flex items-center justify-center text-xl mx-auto">
+                <i class="fas fa-triangle-exclamation"></i>
+            </div>
+            <div class="text-center space-y-1">
+                <h3 id="confirm-title" class="font-serif font-bold text-lg text-slate-900 dark:text-white">Are you sure?</h3>
+                <p id="confirm-message" class="text-xs text-slate-500">This action cannot be undone.</p>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeConfirmModal(false)" class="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-200">Cancel</button>
+                <button id="confirm-yes-btn" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-rose-500/20">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-3 rounded-2xl shadow-2xl text-sm font-medium flex items-center gap-3">
+        <i class="fas fa-check-circle text-brand-500 text-base"></i>
+        <span id="toast-msg">Action completed successfully.</span>
+    </div>
+
+    <script>
+        // Default Mock Seed Articles if localStorage is empty
+        const defaultArticles = [
+            {
+                id: 'art-1',
+                title: 'Global Tech Surge: Semiconductor Manufacturing Hits Record High in Q2',
+                category: 'Technology',
+                author: 'Elena Rostova',
+                date: 'Oct 11, 2026',
+                image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80',
+                excerpt: 'Discover how leading semiconductor fabrication plants are scaling production to meet unprecedented AI hardware demands across enterprise sectors.',
+                body: '<p>The global semiconductor industry has reached a historic milestone this quarter, fueled by staggering demand for advanced AI acceleration hardware and distributed cloud infrastructure nodes. Major fabrication foundries across Taiwan, Europe, and North America reported record capacity utilization.</p><p>According to industry analysts, enterprise investments in localized chip manufacturing have reduced supply chain vulnerabilities by over 34% compared to previous fiscal cycles. Furthermore, new extreme ultraviolet (EUV) lithography breakthroughs are enabling sub-2nm transistor architectures.</p><p>"We are witnessing a foundational re-architecting of global compute capability," stated Dr. Aris Vance during the Zurich Technology Summit. "Silicon is no longer just a commodity component; it is the fundamental currency of national and economic sovereignty."</p>',
+                seoTitle: 'Semiconductor Manufacturing Hits Record High in Q2 2026',
+                seoDesc: 'Leading semiconductor fabs scale production to meet AI hardware demands.',
+                views: 3420,
+                comments: [
+                    { author: 'Marcus Brody', text: 'Incredible analysis! The EUV breakthroughs are truly game-changing.', date: '2 hours ago' },
+                    { author: 'Sarah Jenkins', text: 'Wondering how this will impact consumer GPU pricing in Q4.', date: '45 mins ago' }
+                ]
+            },
+            {
+                id: 'art-2',
+                title: 'Central Banks Signal Coordinated Shift Toward Digital Sovereign Currencies',
+                category: 'Business',
+                author: 'Julian Thorne',
+                date: 'Oct 10, 2026',
+                image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80',
+                excerpt: 'Financial authorities across G7 economies outline interoperability standards for upcoming central bank digital currencies (CBDCs).',
+                body: '<p>In a landmark joint communique issued in Frankfurt, central bankers from major economies established technical frameworks for cross-border CBDC settlement. The initiative aims to streamline international trade and eliminate legacy friction in interbank clearing houses.</p><p>Market participants reacted favorably, noting that cryptographic verification layers will provide unprecedented transparency while preserving retail privacy standards.</p>',
+                seoTitle: 'Central Banks Signal Coordinated Shift Toward CBDCs',
+                seoDesc: 'G7 financial authorities outline interoperability standards for digital currencies.',
+                views: 2190,
+                comments: []
+            },
+            {
+                id: 'art-3',
+                title: 'Deep Space Observatory Detects Atmospheric Signatures on Exoplanet K2-18b',
+                category: 'Science',
+                author: 'Dr. Nadia Kaelen',
+                date: 'Oct 9, 2026',
+                image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80',
+                excerpt: 'Spectroscopic analysis reveals complex carbon-bearing molecules in the habitable zone of a distant sub-Neptune world.',
+                body: '<p>Astronomers operating the orbital infrared telescope array have captured definitive spectroscopic evidence of methane and carbon dioxide in the atmosphere of exoplanet K2-18b, situated 120 light-years away in the constellation Leo.</p><p>While scientists urge caution against premature conclusions regarding biological activity, the presence of these photochemical markers confirms the world possesses a stable hydrogen-rich atmosphere above a water ocean.</p>',
+                seoTitle: 'Space Observatory Detects Signatures on Exoplanet K2-18b',
+                seoDesc: 'Spectroscopic analysis reveals carbon-bearing molecules on distant exoplanet.',
+                views: 4850,
+                comments: [
+                    { author: 'Dr. Thomas Craig', text: 'Fascinating results. JWST follow-ups will be crucial next year.', date: 'Yesterday' }
+                ]
+            },
+            {
+                id: 'art-4',
+                title: 'The Renaissance of Brutalist Architecture in Modern Urban Metros',
+                category: 'Culture',
+                author: 'Claire Vane',
+                date: 'Oct 8, 2026',
+                image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80',
+                excerpt: 'Why contemporary city planners are retrofitting monolithic concrete structures into thriving cultural incubators.',
+                body: '<p>Once maligned as cold and dystopian, raw concrete structures from the mid-20th century are undergoing a remarkable aesthetic rehabilitation. Urban renewal projects in London, Berlin, and Tokyo are transforming abandoned brutalist complexes into vibrant multi-disciplinary art galleries and incubator spaces.</p><p>Architects praise the thermal mass and structural honesty of these monumental edifices.</p>',
+                seoTitle: 'The Renaissance of Brutalist Architecture in Modern Cities',
+                seoDesc: 'How contemporary city planners are retrofitting brutalist concrete complexes.',
+                views: 1540,
+                comments: []
+            },
+            {
+                id: 'art-5',
+                title: 'Autonomous Freight Corridors Transform Transcontinental Logistics',
+                category: 'Technology',
+                author: 'Kenta Sato',
+                date: 'Oct 7, 2026',
+                image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80',
+                excerpt: 'Fully electric autonomous semi-truck fleets achieve 99.8% on-time delivery benchmarks across major highway networks.',
+                body: '<p>Commercial deployment of Level 4 autonomous heavy transport fleets has surpassed initial adoption forecasts. Logistics giants report a 40% reduction in fuel overhead and near-zero driver fatigue incidents during grueling cross-country runs.</p>',
+                seoTitle: 'Autonomous Freight Corridors Transform Logistics',
+                seoDesc: 'Fully electric autonomous semi-truck fleets achieve high on-time benchmarks.',
+                views: 2980,
+                comments: []
+            }
+        ];
+
+        // State Management
+        let articles = JSON.parse(localStorage.getItem('apex_articles')) || defaultArticles;
+        let currentCategory = 'All';
+        let currentView = 'portal'; // 'portal' | 'article' | 'admin'
+        let currentArticleId = null;
+        let adImpressions = parseInt(localStorage.getItem('apex_ad_impressions')) || 14250;
+        let activeAdSlots = { header: true, sidebar: true, native: true };
+
+        const categories = ['All', 'Technology', 'Business', 'World', 'Science', 'Culture', 'Lifestyle'];
+
+        // Helper functions
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        function simulateAdClick() {
+            adImpressions += 15;
+            localStorage.setItem('apex_ad_impressions', adImpressions);
+            showToast('Ad engagement registered! CPM revenue updated.');
+            if (currentView === 'admin') updateAdminStats();
+        }
+
+        // Initialize App on Load
+        window.onload = function() {
+            renderNavCategories();
+            renderTicker();
+            renderHeroSection();
+            renderArticlesFeed();
+            renderTrendingSidebar();
+            updateAdminStats();
+            renderAdminPostsTable();
+            
+            // Search listener
+            const searchInput = document.getElementById('global-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase();
+                    renderArticlesFeed(query);
+                });
+            }
+        };
+
+        // Navigation & View Switcher
+        function switchView(view) {
+            currentView = view;
+            document.getElementById('portal-view').classList.add('hidden');
+            document.getElementById('article-reader-view').classList.add('hidden');
+            document.getElementById('admin-view').classList.add('hidden');
+            
+            const adminBtnText = document.getElementById('admin-btn-text');
+            const adminToggleBtn = document.getElementById('admin-toggle-btn');
+
+            if (view === 'portal') {
+                document.getElementById('portal-view').classList.remove('hidden');
+                adminBtnText.textContent = 'CMS Admin';
+                adminToggleBtn.setAttribute('onclick', 'toggleAdminView()');
+            } else if (view === 'article') {
+                document.getElementById('article-reader-view').classList.remove('hidden');
+                adminBtnText.textContent = 'Home Portal';
+                adminToggleBtn.setAttribute('onclick', "switchView('portal')");
+            } else if (view === 'admin') {
+                document.getElementById('admin-view').classList.remove('hidden');
+                adminBtnText.textContent = 'View Portal';
+                adminToggleBtn.setAttribute('onclick', "switchView('portal')");
+                updateAdminStats();
+                renderAdminPostsTable();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleAdminView() {
+            if (currentView === 'admin') {
+                switchView('portal');
+            } else {
+                switchView('admin');
+            }
+        }
+
+        // Render Nav Categories
+        function renderNavCategories() {
+            const container = document.getElementById('nav-categories');
+            const mobileContainer = document.getElementById('mobile-categories');
+            
+            let html = '';
+            let mobileHtml = '';
+            
+            categories.forEach(cat => {
+                const isActive = currentCategory === cat;
+                const activeClass = isActive 
+                    ? 'bg-slate-900 text-white dark:bg-brand-500 shadow-sm' 
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800';
+                
+                html += `<button onclick="filterCategory('${cat}')" class="px-4 py-2 rounded-full text-sm font-medium transition-all ${activeClass}">${cat}</button>`;
+                mobileHtml += `<button onclick="filterCategory('${cat}')" class="px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 transition-all ${activeClass}">${cat}</button>`;
+            });
+            
+            container.innerHTML = html;
+            mobileContainer.innerHTML = mobileHtml;
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            renderNavCategories();
+            renderHeroSection();
+            renderArticlesFeed();
+            document.getElementById('feed-heading').textContent = cat === 'All' ? 'Latest Dispatches' : `${cat} Dispatches`;
+            if (currentView !== 'portal') switchView('portal');
+        }
+
+        // Ticker Rendering
+        function renderTicker() {
+            const tickerEl = document.getElementById('ticker-content');
+            let html = '';
+            articles.slice(0, 5).forEach(art => {
+                html += `<span class="cursor-pointer hover:underline flex items-center gap-2" onclick="openArticle('${art.id}')"><span class="text-brand-400 font-bold">[${art.category}]</span> ${art.title}</span>`;
+            });
+            // Duplicate for smooth infinite loop
+            tickerEl.innerHTML = html + html;
+        }
+
+        // Hero Section Rendering
+        function renderHeroSection() {
+            const heroEl = document.getElementById('hero-section');
+            const filtered = currentCategory === 'All' ? articles : articles.filter(a => a.category === currentCategory);
+            if (filtered.length === 0) {
+                heroEl.innerHTML = `<div class="p-8 text-center text-slate-500 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">No articles found in this category.</div>`;
+                return;
+            }
+
+            const featured = filtered[0];
+            const secondary = filtered.slice(1, 3);
+
+            let html = `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Main Feature (8 cols) -->
+                    <div onclick="openArticle('${featured.id}')" class="lg:col-span-8 group relative rounded-3xl overflow-hidden shadow-xl cursor-pointer min-h-[420px] flex flex-col justify-end p-8 border border-slate-200 dark:border-slate-800">
+                        <div class="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700" style="background-image: url('${featured.image}')"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                        <div class="relative z-10 space-y-3">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-brand-500 text-white text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">${featured.category}</span>
+                                <span class="text-xs text-slate-300 font-medium"><i class="far fa-clock mr-1"></i> ${featured.date}</span>
+                            </div>
+                            <h1 class="font-serif font-bold text-2xl sm:text-3xl lg:text-4xl text-white leading-tight group-hover:text-brand-300 transition-colors">${featured.title}</h1>
+                            <p class="text-slate-300 text-sm line-clamp-2 max-w-2xl">${featured.excerpt}</p>
+                            <div class="flex items-center gap-3 pt-2 text-xs text-slate-300">
+                                <span class="font-semibold text-white">By ${featured.author}</span>
+                                <span>&bull;</span>
+                                <span><i class="far fa-eye mr-1"></i> ${featured.views} reads</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secondary Stack (4 cols) -->
+                    <div class="lg:col-span-4 flex flex-col gap-6">
+            `;
+
+            if (secondary.length > 0) {
+                secondary.forEach(art => {
+                    html += `
+                        <div onclick="openArticle('${art.id}')" class="group bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm flex gap-4 cursor-pointer hover:border-brand-500 transition-all">
+                            <div class="w-28 h-28 rounded-xl bg-cover bg-center shrink-0" style="background-image: url('${art.image}')"></div>
+                            <div class="flex flex-col justify-between">
+                                <div>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">${art.category}</span>
+                                    <h3 class="font-serif font-bold text-sm text-slate-900 dark:text-white group-hover:text-brand-600 line-clamp-2 mt-0.5">${art.title}</h3>
+                                </div>
+                                <span class="text-[11px] text-slate-400">${art.date} &bull; ${art.views} reads</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                html += `
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center text-center h-full text-slate-400 text-xs">
+                        <i class="fas fa-newspaper text-2xl mb-2 text-slate-300"></i>
+                        <span>More dispatches coming soon to this section.</span>
+                    </div>
+                `;
+            }
+
+            html += `</div></div>`;
+            heroEl.innerHTML = html;
+        }
+
+        // Articles Feed Rendering
+        function renderArticlesFeed(searchQuery = '') {
+            const feedEl = document.getElementById('articles-feed');
+            let filtered = currentCategory === 'All' ? articles : articles.filter(a => a.category === currentCategory);
+            
+            if (searchQuery) {
+                filtered = filtered.filter(a => a.title.toLowerCase().includes(searchQuery) || a.excerpt.toLowerCase().includes(searchQuery) || a.author.toLowerCase().includes(searchQuery));
+            }
+
+            const countLabel = document.getElementById('article-count-label');
+            if (countLabel) {
+                countLabel.textContent = `${filtered.length} articles`;
+            }
+
+            if (filtered.length === 0) {
+                feedEl.innerHTML = `
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-12 text-center border border-slate-200 dark:border-slate-800 space-y-3">
+                        <i class="fas fa-search text-3xl text-slate-400"></i>
+                        <h3 class="font-bold text-lg">No articles found</h3>
+                        <p class="text-xs text-slate-500">Try adjusting your search query or category filter.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach((art, idx) => {
+                // Insert Native Ad Card at index 2 if enabled
+                if (idx === 2 && activeAdSlots.native) {
+                    html += `
+                        <div class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+                            <div class="space-y-1 text-left">
+                                <span class="bg-amber-500 text-white text-[10px] font-mono px-2 py-0.5 rounded uppercase tracking-wider">Sponsored Native Card</span>
+                                <h4 class="font-serif font-bold text-lg text-slate-900 dark:text-white">Accelerate Your Cloud Infrastructure with ApexCloud Enterprise</h4>
+                                <p class="text-xs text-slate-500">Deploy high-performance distributed Kubernetes clusters instantly across 40+ global edge locations.</p>
+                            </div>
+                            <button onclick="simulateAdClick()" class="bg-slate-900 dark:bg-brand-500 text-white text-xs font-semibold px-5 py-2.5 rounded-xl shrink-0 hover:bg-slate-800 transition-colors shadow">Claim Free Credit</button>
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div onclick="openArticle('${art.id}')" class="group bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row gap-6 cursor-pointer hover:border-brand-500 transition-all">
+                        <div class="w-full sm:w-56 h-40 rounded-xl bg-cover bg-center shrink-0" style="background-image: url('${art.image}')"></div>
+                        <div class="flex flex-col justify-between flex-grow space-y-2">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">${art.category}</span>
+                                    <span>&bull;</span>
+                                    <span class="text-[11px] text-slate-400">${art.date}</span>
+                                </div>
+                                <h3 class="font-serif font-bold text-lg text-slate-900 dark:text-white group-hover:text-brand-600 transition-colors">${art.title}</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">${art.excerpt}</p>
+                            </div>
+                            <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-100 dark:border-slate-800">
+                                <span class="font-medium text-slate-700 dark:text-slate-300">By ${art.author}</span>
+                                <span class="text-slate-400"><i class="far fa-eye mr-1"></i> ${art.views} reads</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            feedEl.innerHTML = html;
+        }
+
+        // Trending Sidebar Rendering
+        function renderTrendingSidebar() {
+            const listEl = document.getElementById('trending-sidebar-list');
+            const sorted = [...articles].sort((a, b) => b.views - a.views).slice(0, 4);
+            
+            let html = '';
+            sorted.forEach((art, i) => {
+                html += `
+                    <div onclick="openArticle('${art.id}')" class="py-3.5 first:pt-0 last:pb-0 flex items-start gap-3 cursor-pointer group">
+                        <span class="font-serif font-black text-2xl text-slate-300 dark:text-slate-700 group-hover:text-brand-600 transition-colors">0${i+1}</span>
+                        <div>
+                            <h4 class="font-serif font-bold text-sm text-slate-900 dark:text-white group-hover:text-brand-600 transition-colors line-clamp-2">${art.title}</h4>
+                            <span class="text-[11px] text-slate-400 mt-0.5 block">${art.views} reads &bull; ${art.category}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            listEl.innerHTML = html;
+        }
+
+        // Open Article Reader View
+        function openArticle(id) {
+            const art = articles.find(a => a.id === id);
+            if (!art) return;
+
+            // Increment views & ad impressions simulation
+            art.views += 1;
+            adImpressions += 1;
+            localStorage.setItem('apex_articles', JSON.stringify(articles));
+            localStorage.setItem('apex_ad_impressions', adImpressions);
+
+            currentArticleId = id;
+            switchView('article');
+
+            const readerEl = document.getElementById('article-reader-view');
+            
+            let commentsHtml = '';
+            if (art.comments && art.comments.length > 0) {
+                art.comments.forEach(c => {
+                    commentsHtml += `
+                        <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-xs text-slate-900 dark:text-white">${c.author}</span>
+                                <span class="text-[10px] text-slate-400">${c.date}</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${c.text}</p>
+                        </div>
+                    `;
+                });
+            } else {
+                commentsHtml = `<p class="text-xs text-slate-400 italic">No comments yet. Be the first to join the editorial debate.</p>`;
+            }
+
+            readerEl.innerHTML = `
+                <div class="space-y-6">
+                    <!-- Back Button -->
+                    <button onclick="switchView('portal')" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-900 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all">
+                        <i class="fas fa-arrow-left"></i> Back to Dispatches
+                    </button>
+
+                    <!-- Article Header -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-brand-500 text-white text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">${art.category}</span>
+                            <span class="text-xs text-slate-500"><i class="far fa-clock mr-1"></i> ${art.date}</span>
+                            <span class="text-xs text-slate-500"><i class="far fa-eye mr-1"></i> ${art.views} reads</span>
+                            <span class="text-xs text-slate-500"><i class="far fa-hourglass mr-1"></i> 3 min read</span>
+                        </div>
+                        <h1 class="font-serif font-black text-3xl sm:text-4xl lg:text-5xl text-slate-900 dark:text-white leading-tight">${art.title}</h1>
+                        <p class="text-base text-slate-600 dark:text-slate-300 font-serif italic leading-relaxed">${art.excerpt}</p>
+                        
+                        <!-- Author Bar -->
+                        <div class="flex items-center justify-between py-4 border-y border-slate-200 dark:border-slate-800">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center text-sm shadow">
+                                    ${art.author.charAt(0)}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-900 dark:text-white">${art.author}</h4>
+                                    <span class="text-xs text-slate-400">Senior Global Correspondent</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="shareArticle('${art.title}')" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-brand-50 hover:text-brand-600 transition-colors" title="Share Article"><i class="fas fa-share-nodes text-xs"></i></button>
+                                <button onclick="showToast('Article saved to your reading list!')" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-brand-50 hover:text-brand-600 transition-colors" title="Bookmark"><i class="far fa-bookmark text-xs"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Featured Image -->
+                    <div class="rounded-3xl overflow-hidden shadow-xl h-[380px] sm:h-[480px] bg-cover bg-center border border-slate-200 dark:border-slate-800" style="background-image: url('${art.image}')"></div>
+
+                    <!-- Article Body Content -->
+                    <div class="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-serif leading-relaxed text-base sm:text-lg space-y-6">
+                        ${art.body}
+                    </div>
+
+                    <!-- In-Article Banner Ad -->
+                    <div class="bg-slate-100 dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-2 my-8">
+                        <span class="text-[10px] uppercase font-mono tracking-widest text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">Native Sponsored Unit</span>
+                        <h4 class="font-serif font-bold text-base text-slate-900 dark:text-white">Apex Cloud Infrastructure & Enterprise Security</h4>
+                        <p class="text-xs text-slate-500">Scale your workload seamlessly with zero-trust edge encryption.</p>
+                        <button onclick="simulateAdClick()" class="mt-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold px-4 py-2 rounded-xl">Explore Partner Program</button>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+                        <h3 class="font-serif font-bold text-xl text-slate-900 dark:text-white">Reader Discussion (${art.comments ? art.comments.length : 0})</h3>
+                        
+                        <form onsubmit="handleCommentSubmit(event, '${art.id}')" class="space-y-3">
+                            <input type="text" id="comment-author" required placeholder="Your Name or Alias" class="w-full bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-2.5 text-sm border border-slate-200 dark:border-slate-700 focus:outline-none">
+                            <textarea id="comment-text" required rows="3" placeholder="Share your perspective on this dispatch..." class="w-full bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-2.5 text-sm border border-slate-200 dark:border-slate-700 focus:outline-none"></textarea>
+                            <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-md transition-all">Submit Comment</button>
+                        </form>
+
+                        <div class="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                            ${commentsHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Comment Submission
+        function handleCommentSubmit(event, articleId) {
+            event.preventDefault();
+            const author = document.getElementById('comment-author').value;
+            const text = document.getElementById('comment-text').value;
+
+            const art = articles.find(a => a.id === articleId);
+            if (!art) return;
+
+            if (!art.comments) art.comments = [];
+            art.comments.unshift({ author, text, date: 'Just now' });
+
+            localStorage.setItem('apex_articles', JSON.stringify(articles));
+            showToast('Comment posted successfully!');
+            openArticle(articleId);
+        }
+
+        // Admin Dashboard Stats & Table
+        function updateAdminStats() {
+            const totalPosts = articles.length;
+            const totalViews = articles.reduce((acc, curr) => acc + curr.views, 0);
+            const estEarnings = (adImpressions * 0.0048).toFixed(2); // $4.80 CPM
+
+            document.getElementById('stat-total-posts').textContent = totalPosts;
+            document.getElementById('stat-total-views').textContent = totalViews.toLocaleString();
+            document.getElementById('stat-ad-impressions').textContent = adImpressions.toLocaleString();
+            document.getElementById('stat-est-earnings').textContent = `$${estEarnings}`;
+        }
+
+        function renderAdminPostsTable(searchQ = '') {
+            const tbody = document.getElementById('admin-posts-table-body');
+            let filtered = articles;
+            if (searchQ) {
+                filtered = articles.filter(a => a.title.toLowerCase().includes(searchQ) || a.author.toLowerCase().includes(searchQ));
+            }
+
+            document.getElementById('admin-post-count-label').textContent = `Showing ${filtered.length} of ${articles.length} posts`;
+
+            let html = '';
+            filtered.forEach(art => {
+                html += `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                        <td class="p-4 font-medium text-slate-900 dark:text-white max-w-xs truncate">${art.title}</td>
+                        <td class="p-4"><span class="bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-xs px-2.5 py-1 rounded-full font-medium">${art.category}</span></td>
+                        <td class="p-4 text-slate-600 dark:text-slate-400">${art.author}</td>
+                        <td class="p-4 text-slate-400 text-xs">${art.date}</td>
+                        <td class="p-4 text-center font-bold text-slate-700 dark:text-slate-300">${art.views}</td>
+                        <td class="p-4 text-right space-x-2">
+                            <button onclick="editPost('${art.id}')" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-50 hover:text-brand-600" title="Edit"><i class="fas fa-pen text-xs"></i></button>
+                            <button onclick="confirmDeletePost('${art.id}')" class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-900/30 text-rose-600 hover:bg-rose-100" title="Delete"><i class="fas fa-trash text-xs"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function filterAdminPosts() {
+            const q = document.getElementById('admin-search-posts').value.toLowerCase();
+            renderAdminPostsTable(q);
+        }
+
+        // Admin Tabs Switcher
+        function switchAdminTab(tab) {
+            document.getElementById('admin-tab-posts-content').classList.add('hidden');
+            document.getElementById('admin-tab-ads-content').classList.add('hidden');
+            document.getElementById('admin-tab-seo-content').classList.add('hidden');
+
+            document.getElementById('admin-tab-posts-btn').className = 'pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-900 transition-colors';
+            document.getElementById('admin-tab-ads-btn').className = 'pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-900 transition-colors';
+            document.getElementById('admin-tab-seo-btn').className = 'pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-900 transition-colors';
+
+            document.getElementById(`admin-tab-${tab}-content`).classList.remove('hidden');
+            document.getElementById(`admin-tab-${tab}-btn`).className = 'pb-3 text-sm font-semibold border-b-2 border-brand-600 text-brand-600 transition-colors';
+        }
+
+        // Post Creator Modal Logic
+        function openPostModal(editId = null) {
+            document.getElementById('post-modal').classList.remove('hidden');
+            document.getElementById('post-modal').classList.add('flex');
+            
+            if (editId) {
+                const art = articles.find(a => a.id === editId);
+                if (art) {
+                    document.getElementById('post-modal-title').textContent = 'Edit Article Dispatch';
+                    document.getElementById('edit-post-id').value = art.id;
+                    document.getElementById('post-title').value = art.title;
+                    document.getElementById('post-category').value = art.category;
+                    document.getElementById('post-author').value = art.author;
+                    document.getElementById('post-image').value = art.image;
+                    document.getElementById('post-excerpt').value = art.excerpt;
+                    document.getElementById('post-body').value = art.body;
+                    document.getElementById('post-seo-title').value = art.seoTitle || '';
+                    document.getElementById('post-seo-desc').value = art.seoDesc || '';
+                }
+            } else {
+                document.getElementById('post-modal-title').textContent = 'Create New Article';
+                document.getElementById('post-form').reset();
+                document.getElementById('edit-post-id').value = '';
+                document.getElementById('post-image').value = 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80';
+            }
+        }
+
+        function closePostModal() {
+            document.getElementById('post-modal').classList.add('hidden');
+            document.getElementById('post-modal').classList.remove('flex');
+        }
+
+        function editPost(id) {
+            openPostModal(id);
+        }
+
+        function handlePostSubmit(e) {
+            e.preventDefault();
+            const editId = document.getElementById('edit-post-id').value;
+            const title = document.getElementById('post-title').value;
+            const category = document.getElementById('post-category').value;
+            const author = document.getElementById('post-author').value;
+            const image = document.getElementById('post-image').value;
+            const excerpt = document.getElementById('post-excerpt').value;
+            const body = document.getElementById('post-body').value;
+            const seoTitle = document.getElementById('post-seo-title').value;
+            const seoDesc = document.getElementById('post-seo-desc').value;
+
+            if (editId) {
+                const art = articles.find(a => a.id === editId);
+                if (art) {
+                    art.title = title;
+                    art.category = category;
+                    art.author = author;
+                    art.image = image;
+                    art.excerpt = excerpt;
+                    art.body = body.includes('<p>') ? body : `<p>${body.replace(/\n\n/g, '</p><p>')}</p>`;
+                    art.seoTitle = seoTitle;
+                    art.seoDesc = seoDesc;
+                }
+                showToast('Article updated successfully!');
+            } else {
+                const newArt = {
+                    id: 'art-' + Date.now(),
+                    title,
+                    category,
+                    author,
+                    date: 'Oct 11, 2026',
+                    image,
+                    excerpt,
+                    body: body.includes('<p>') ? body : `<p>${body.replace(/\n\n/g, '</p><p>')}</p>`,
+                    seoTitle,
+                    seoDesc,
+                    views: 1,
+                    comments: []
+                };
+                articles.unshift(newArt);
+                showToast('New article published successfully!');
+            }
+
+            localStorage.setItem('apex_articles', JSON.stringify(articles));
+            closePostModal();
+            renderHeroSection();
+            renderArticlesFeed();
+            renderTrendingSidebar();
+            renderTicker();
+            updateAdminStats();
+            renderAdminPostsTable();
+        }
+
+        let pendingDeleteId = null;
+        function confirmDeletePost(id) {
+            pendingDeleteId = id;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+            document.getElementById('confirm-modal').classList.add('flex');
+            document.getElementById('confirm-title').textContent = 'Delete Dispatch?';
+            document.getElementById('confirm-message').textContent = 'Are you sure you want to permanently delete this article from the CMS?';
+            
+            const yesBtn = document.getElementById('confirm-yes-btn');
+            yesBtn.onclick = function() {
+                articles = articles.filter(a => a.id !== pendingDeleteId);
+                localStorage.setItem('apex_articles', JSON.stringify(articles));
+                closeConfirmModal(true);
+                showToast('Article deleted successfully.');
+                renderHeroSection();
+                renderArticlesFeed();
+                renderTrendingSidebar();
+                renderTicker();
+                updateAdminStats();
+                renderAdminPostsTable();
+            };
+        }
+
+        function closeConfirmModal(success = false) {
+            document.getElementById('confirm-modal').classList.add('hidden');
+            document.getElementById('confirm-modal').classList.remove('flex');
+        }
+
+        // Utilities
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.className = 'fas fa-moon text-sm';
+                localStorage.setItem('apex_theme', 'light');
+            } else {
+                html.classList.add('dark');
+                icon.className = 'fas fa-sun text-sm';
+                localStorage.setItem('apex_theme', 'dark');
+            }
+        }
+
+        // Restore theme on load
+        if (localStorage.getItem('apex_theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+            const themeIcon = document.getElementById('theme-icon');
+            if (themeIcon) themeIcon.className = 'fas fa-sun text-sm';
+        }
+
+        function toggleAdSlot(slot) {
+            activeAdSlots[slot] = !activeAdSlots[slot];
+            showToast(`Ad slot (${slot}) status toggled.`);
+        }
+
+        function handleNewsletter(e) {
+            e.preventDefault();
+            showToast('Thank you for subscribing to Apex Morning Brief!');
+            e.target.reset();
+        }
+
+        function shareArticle(title) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(window.location.href);
+                showToast(`Copied link for "${title}" to clipboard!`);
+            } else {
+                showToast('Article share link generated.');
+            }
+        }
+
+        function exportDataJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(articles, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "apexnews_backup_2026.json");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+            showToast('Editorial backup exported successfully.');
+        }
+    </script>
+</body>
+</html>
